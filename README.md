@@ -14,7 +14,11 @@ O script [parser_filmow.py](parser_filmow.py) usa a classe [`Parser`](parser_fil
   - **Directors**
   - **Year**
   - **Rating**
-- Gerar arquivos CSV em lotes de até **1900 filmes por arquivo**
+- Gerar arquivos CSV no formato de importação do Letterboxd:
+  - delimitador `,` (vírgula)
+  - codificação UTF-8
+  - escaping de aspas com `\` dentro de campos com texto
+  - divisão automática em múltiplos arquivos para respeitar o limite de **1MB por arquivo**
   - Exemplo: [1johndoe.csv](1johndoe.csv)
 
 ## Requisitos

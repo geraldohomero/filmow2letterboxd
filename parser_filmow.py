@@ -1,9 +1,10 @@
 import logging
 import dataclasses as dc
+import csv
+import io
 from urllib.parse import urljoin
 import requests
 import regex as re
-import pandas as pd
 from bs4 import BeautifulSoup
 
 
@@ -190,25 +191,72 @@ class Parser:
             return False
 
     def write_csv_files (self) -> None:
-        df = pd.DataFrame(self.movies, columns=["Title", "Directors", "Year", "Rating"])
+        fieldnames = ["Title", "Directors", "Year", "Rating"]
+        max_file_size_bytes = 1_000_000
 
-        curr_file = 1
-        start_index = 0
-        end_index = min(1900, len(self.movies))
+        if not self.movies:
+            output = self._build_csv_content([], fieldnames)
+            with open(f"1{self.user}.csv", "w", encoding="UTF-8", newline="") as file:
+                file.write(output)
+            log.info("Exportação concluída: 1 arquivo CSV gerado (sem filmes).")
+            return
 
-        while end_index < len(self.movies):
-            df[ start_index : end_index ].to_csv(
-                f"{curr_file}{self.user}.csv", index=False, encoding="UTF-8"
-            )
+        chunks: list[list[dict[str, str]]] = []
+        current_chunk: list[dict[str, str]] = []
 
-            start_index = end_index
-            end_index = min(start_index + 1900, len(self.movies))
-            curr_file += 1
+        for movie in self.movies:
+            candidate_chunk = [*current_chunk, movie]
+            candidate_csv = self._build_csv_content(candidate_chunk, fieldnames)
+            candidate_size = len(candidate_csv.encode("UTF-8"))
 
-        df[ start_index : end_index ].to_csv(
-            f"{curr_file}{self.user}.csv", index=False, encoding="UTF-8"
+            if candidate_size <= max_file_size_bytes:
+                current_chunk = candidate_chunk
+                continue
+
+            if not current_chunk:
+                log.warning(
+                    "Filme muito grande para o limite de 1MB; exportando sozinho em um arquivo: %s",
+                    movie.get("Title", "(sem título)"),
+                )
+                chunks.append([movie])
+                current_chunk = []
+                continue
+
+            chunks.append(current_chunk)
+            current_chunk = [movie]
+
+        if current_chunk:
+            chunks.append(current_chunk)
+
+        for index, chunk in enumerate(chunks, start=1):
+            output = self._build_csv_content(chunk, fieldnames)
+            with open(f"{index}{self.user}.csv", "w", encoding="UTF-8", newline="") as file:
+                file.write(output)
+
+        log.info(f"Exportação concluída: {len(chunks)} arquivo(s) CSV gerado(s).")
+
+    def _build_csv_content(
+        self,
+        rows: list[dict[str, str]],
+        fieldnames: list[str],
+    ) -> str:
+        buffer = io.StringIO()
+        writer = csv.DictWriter(
+            buffer,
+            fieldnames=fieldnames,
+            delimiter=",",
+            quoting=csv.QUOTE_MINIMAL,
+            escapechar="\\",
+            doublequote=False,
+            lineterminator="\n",
+            extrasaction="ignore",
         )
-        log.info(f"Exportação concluída: {curr_file} arquivo(s) CSV gerado(s).")
+        writer.writeheader()
+
+        for row in rows:
+            writer.writerow({key: row.get(key) if row.get(key) is not None else "" for key in fieldnames})
+
+        return buffer.getvalue()
 
 
 if __name__ == "__main__":
