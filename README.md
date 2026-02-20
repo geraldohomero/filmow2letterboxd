@@ -1,4 +1,4 @@
-# Filmow → Letterboxd CSV
+# Filmow → Letterboxd CSV (2026)
 
 Converte sua lista de filmes “já vi” do Filmow em arquivos CSV compatíveis com importação no Letterboxd.
 
