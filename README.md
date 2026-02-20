@@ -2,6 +2,8 @@
 
 Converte sua lista de filmes “já vi” do Filmow em arquivos CSV compatíveis com importação no Letterboxd.
 
+> Script baseado em: https://github.com/yanari/filmow_to_letterboxd
+
 ## Como funciona
 
 O script [parser_filmow.py](parser_filmow.py) usa a classe [`Parser`](parser_filmow.py) para:
