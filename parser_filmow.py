@@ -1,5 +1,4 @@
 import logging
-import webbrowser
 import dataclasses as dc
 from urllib.parse import urljoin
 import requests
