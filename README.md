@@ -31,6 +31,9 @@ O script [parser_filmow.py](parser_filmow.py) usa a classe [`Parser`](parser_fil
 Use o script [init.sh](init.sh):
 
 ```bash
+cd Downloads
+git clone https://github.com/geraldohomero/filmow2letterboxd
+cd filmow2letterboxd
 chmod +x init.sh
 ./init.sh
 ```
