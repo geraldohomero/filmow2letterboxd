@@ -1,5 +1,8 @@
 # Filmow → Letterboxd CSV (2026)
 
+<img width="1536" height="866" alt="Logo" src="https://github.com/user-attachments/assets/33ffed3f-fedb-4ff7-b013-f534692c57a9" />
+
+
 Converte sua lista de filmes “já vi” do Filmow em arquivos CSV compatíveis com importação no Letterboxd.
 
 > Script baseado em: https://github.com/yanari/filmow_to_letterboxd
